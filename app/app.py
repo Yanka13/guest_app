@@ -17,27 +17,33 @@ MIGRATE = Migrate(app, database)
 from models import *
 
 @app.route('/')
-def view_registered_guests():
+def view_guests():
     guests = Guest.query.all()
     return render_template('guest_list.html', guests=guests)
 
 
-@app.route('/register', methods = ['GET'])
+@app.route('/join', methods = ['GET'])
 def view_registration_form():
-    return render_template('guest_registration.html')
+    return render_template('guest_registration_form.html')
 
 
-@app.route('/register', methods = ['POST'])
-def register_guest():
-    name = request.form.get('name')
+@app.route('/join', methods = ['POST'])
+def join_guest():
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
     email = request.form.get('email')
+
+    meal_option = request.form.get('meal_option')
+    if not meal_option or meal_option == '':
+        meal_option = "vegetarian"
+
     group_size = request.form.get('group_size')
     if not group_size or group_size=='':
         group_size = 1
 
-    guest = Guest(name, email, group_size)
+    guest = Guest(first_name, last_name, email, meal_option, group_size)
     database.session.add(guest)
     database.session.commit()
 
     return render_template('guest_confirmation.html',
-        name=name, email=email, group_size=group_size)
+    first_name=first_name, last_name=last_name, email=email, meal_option=meal_option, group_size=group_size)
